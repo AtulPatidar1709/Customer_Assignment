@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+// Define the contact schema
+// It includes fields for phone number, email, linked contact ID, link precedence, and timestamps
 const contactSchema = new mongoose.Schema({
     phoneNumber: { type: String, default: null },
     email: { type: String, default: null },

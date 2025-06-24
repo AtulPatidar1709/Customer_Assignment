@@ -6,16 +6,22 @@ import { connection } from "./config/db.js";
 dotenv.config();
 
 const app = express();
+
 app.use(express.json());
 
+// Set up the root route
+app.get("/", (req, res) => {
+  res.send("Welcome to the Zamazon API");
+});
+
+// Use the identify router for handling contact identification and retrieval
 app.use("/identify", identifyRouter);
 
-app.use((err, req, res, next) => {
-  res.status(500).json({ error: "Temporal anomaly detected. Seek alternate dimension." });
+const PORT = process.env.PORT || 3000;
+
+// Start the server and connect to the database
+app.listen(PORT, () => {
+  console.log(`🚀 Server listening on ${process.env.URL}`);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server listening on http://localhost:${PORT}`);
-});
 connection();

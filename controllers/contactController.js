@@ -1,5 +1,7 @@
 import { Contact } from "../models/Contact.js";
 
+// This function identifies a contact based on email or phone number
+// It creates a new contact if no match is found, or links to an existing contact 
 export const identifyContact = async (req, res, next) => {
   try {
     const { email, phoneNumber } = req.body;
@@ -8,17 +10,17 @@ export const identifyContact = async (req, res, next) => {
     }
 
     function validatePhoneNumber(phone) {
-        const phoneRegex = /^\d{10}$/;
-        return phoneRegex.test(phone);
+      const phoneRegex = /^\d{10}$/;
+      return phoneRegex.test(phone);
     }
 
     function validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
     }
 
     if (!validatePhoneNumber(phoneNumber) || !validateEmail(email)) {
-        return res.status(400).json({ error: "Invalid Phone Number or Email." });
+      return res.status(400).json({ error: "Invalid Phone Number or Email." });
     }
     const matchedContacts = await Contact.find({
       $or: [
@@ -45,7 +47,13 @@ export const identifyContact = async (req, res, next) => {
     }
 
     const primaries = matchedContacts.filter(c => c.linkPrecedence === "primary");
-    primaryContact = primaries[0];
+
+    if (primaries.length === 0) {
+      // Fallback: treat the first matched contact as primary
+      primaryContact = matchedContacts[0];
+    } else {
+      primaryContact = primaries[0];
+    }
 
     if (primaries.length > 1) {
       for (let i = 1; i < primaries.length; i++) {
@@ -95,3 +103,13 @@ export const identifyContact = async (req, res, next) => {
     next(err);
   }
 };
+
+//get all contacts
+export const getAllContact = async (req, res, next) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: 1 });
+    res.status(200).json(contacts);
+  } catch (err) {
+    next(err);
+  }
+}
